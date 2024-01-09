@@ -344,13 +344,14 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         # import time
         # time.sleep(1)
 
+        corner_state = current_state[0]['corner_state']
         flag = False
         # Check each space?
-        for visited_node in visited:
+        for visited_node in visited[corner_state]:
             # Compare visited node in same space?
-            if current_state[0] == visited_node[0]:
+            if current_state[0]['position'] == visited_node[0]['position']:
                 if f_value < visited_node[1]:
-                    visited.remove(visited_node)
+                    visited[corner_state].remove(visited_node)
                 else:
                     flag = True
 
@@ -359,7 +360,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if flag:
             continue
 
-        visited.append((current_state[0], f_value))
+        visited[corner_state].append((current_state[0], f_value))
 
         successors = problem.getSuccessors(current_state[0])
 
@@ -374,7 +375,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
             new_path = current_state[1] + [successor[1]]
 
             priority_queue.push((successor[0], new_path, g_value), f_value)
+        # print(corner_state)
 
+    print(f_value)
     return path
 
     # util.raiseNotDefined()
