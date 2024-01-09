@@ -139,6 +139,7 @@ def breadthFirstSearch(problem):
     queue.push((start_state, []))
 
     from searchAgents import CornersProblem
+    # Corners Problem
     if isinstance(problem, CornersProblem):
         visited = {to_bin(key, len(problem.corners)): [] for key in range(0, 16)}
         while not queue.isEmpty():
@@ -167,6 +168,8 @@ def breadthFirstSearch(problem):
             visited[corner_state].append(current_state[0]['position'])
             # problem.visited.append(current_state[0])
             # print(queue.list)
+
+    # Position Problem
     else:
         visited = []
         while not queue.isEmpty():
@@ -188,7 +191,7 @@ def breadthFirstSearch(problem):
 
             visited.append(current_state[0])
 
-    print(path)
+    # print(path)
     return path
 
     # util.raiseNotDefined()
@@ -248,136 +251,128 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-
-    # from util import PriorityQueue
-    #
-    # start_state = problem.getStartState()
-    #
-    # priority_queue = PriorityQueue()
-    # visited = []
-    # path = None
-    #
-    # # Queue Ele: (State, path, cost)
-    # # Priority: f func
-    # # push(ele, priority)
-    # priority_queue.push((start_state, [], 0), 0.0)
-    #
-    # while not priority_queue.isEmpty():
-    #     # priority_queue.print()
-    #     current_state = priority_queue.pop()
-    #     # print(current_state)
-    #     # import time
-    #     # time.sleep(1)
-    #
-    #     if problem.isGoalState(current_state[0]):
-    #         path = current_state[1]
-    #         break
-    #
-    #     h_value = heuristic(current_state[0], problem)
-    #     g_value = current_state[2]
-    #     f_value = h_value + g_value
-    #
-    #     # print(current_state[0], f_value)
-    #     # import time
-    #     # time.sleep(1)
-    #
-    #     flag = False
-    #     for visited_node in visited:
-    #         if current_state[0] == visited_node[0]:
-    #             if f_value < visited_node[1]:
-    #                 visited.remove(visited_node)
-    #             else:
-    #                 flag = True
-    #
-    #             break
-    #
-    #     if flag:
-    #         continue
-    #
-    #     visited.append((current_state[0], f_value))
-    #
-    #     successors = problem.getSuccessors(current_state[0])
-    #
-    #     for successor in successors:
-    #         # print(successor)
-    #         # import time
-    #         # time.sleep(1)
-    #         h_value = heuristic(successor[0], problem)
-    #         g_value = current_state[2] + successor[2]
-    #         f_value = h_value + g_value
-    #
-    #         new_path = current_state[1] + [successor[1]]
-    #
-    #         priority_queue.push((successor[0], new_path, g_value), f_value)
-    #
-    # return path
-
     from util import PriorityQueue
 
     start_state = problem.getStartState()
-
     priority_queue = PriorityQueue()
     path = None
-    visited = {to_bin(key, len(problem.corners)): [] for key in range(0, 16)}
-
-    # Queue Ele: (State, path, cost)
-    # Priority: f func
-    # push(ele, priority)
     priority_queue.push((start_state, [], 0), 0.0)
+    # Queue Ele: (State, path, cost)
+    # Priority: f value
+    # push(ele, priority)
 
-    while not priority_queue.isEmpty():
-        # priority_queue.print()
-        current_state = priority_queue.pop()
-        # print(current_state)
-        # import time
-        # time.sleep(1)
-
-        if problem.isGoalState(current_state[0]):
-            path = current_state[1]
-            break
-
-        h_value = heuristic(current_state[0], problem)
-        g_value = current_state[2]
-        f_value = h_value + g_value
-
-        # print(current_state[0], f_value)
-        # import time
-        # time.sleep(1)
-
-        corner_state = current_state[0]['corner_state']
-        flag = False
-        # Check each space?
-        for visited_node in visited[corner_state]:
-            # Compare visited node in same space?
-            if current_state[0]['position'] == visited_node[0]['position']:
-                if f_value < visited_node[1]:
-                    visited[corner_state].remove(visited_node)
-                else:
-                    flag = True
-
-                break
-
-        if flag:
-            continue
-
-        visited[corner_state].append((current_state[0], f_value))
-
-        successors = problem.getSuccessors(current_state[0])
-
-        for successor in successors:
-            # print(successor)
+    # Corners Problem
+    from searchAgents import CornersProblem
+    if isinstance(problem, CornersProblem):
+        visited = {to_bin(key, len(problem.corners)): [] for key in range(0, 16)}
+        while not priority_queue.isEmpty():
+            # priority_queue.print()
+            current_state = priority_queue.pop()
+            # print(current_state)
             # import time
             # time.sleep(1)
-            h_value = heuristic(successor[0], problem)
-            g_value = current_state[2] + successor[2]
+
+            if problem.isGoalState(current_state[0]):
+                path = current_state[1]
+                break
+
+            h_value = heuristic(current_state[0], problem)
+            g_value = current_state[2]
             f_value = h_value + g_value
 
-            new_path = current_state[1] + [successor[1]]
 
-            priority_queue.push((successor[0], new_path, g_value), f_value)
-        # print(corner_state)
+            # print(current_state[0], f_value)
+            # import time
+            # time.sleep(1)
 
-    print(f_value)
+            corner_state = current_state[0]['corner_state']
+            flag = False
+            # Check each space?
+            for visited_node in visited[corner_state]:
+                # Compare visited node in same space?
+                if current_state[0]['position'] == visited_node[0]['position']:
+                    if f_value < visited_node[1]:
+                        visited[corner_state].remove(visited_node)
+                    else:
+                        flag = True
+
+                    break
+
+            if flag:
+                continue
+
+            visited[corner_state].append((current_state[0], f_value))
+
+            successors = problem.getSuccessors(current_state[0])
+
+            for successor in successors:
+                # print(successor)
+                # import time
+                # time.sleep(1)
+                h_value = heuristic(successor[0], problem)
+                g_value = current_state[2] + successor[2]
+                f_value = h_value + g_value
+                # print(h_value)
+                # if h_value == 0:
+                #     print("hereeeeeeeeeeeeeeeeeeeeee")
+
+                new_path = current_state[1] + [successor[1]]
+
+                priority_queue.push((successor[0], new_path, g_value), f_value)
+
+            # print(corner_state)
+
+    # Position Problem
+    else:
+        visited = []
+        while not priority_queue.isEmpty():
+            # priority_queue.print()
+            current_state = priority_queue.pop()
+            # print(current_state)
+            # import time
+            # time.sleep(1)
+
+            if problem.isGoalState(current_state[0]):
+                path = current_state[1]
+                break
+
+            h_value = heuristic(current_state[0], problem)
+            g_value = current_state[2]
+            f_value = h_value + g_value
+
+            # print(current_state[0], f_value)
+            # import time
+            # time.sleep(1)
+
+            flag = False
+            for visited_node in visited:
+                if current_state[0] == visited_node[0]:
+                    if f_value < visited_node[1]:
+                        visited.remove(visited_node)
+                    else:
+                        flag = True
+
+                    break
+
+            if flag:
+                continue
+
+            visited.append((current_state[0], f_value))
+
+            successors = problem.getSuccessors(current_state[0])
+
+            for successor in successors:
+                # print(successor)
+                # import time
+                # time.sleep(1)
+                h_value = heuristic(successor[0], problem)
+                g_value = current_state[2] + successor[2]
+                f_value = h_value + g_value
+
+                new_path = current_state[1] + [successor[1]]
+
+                priority_queue.push((successor[0], new_path, g_value), f_value)
+    # print(f_value)
     return path
 
     # util.raiseNotDefined()

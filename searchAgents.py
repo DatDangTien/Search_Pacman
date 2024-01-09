@@ -271,6 +271,13 @@ def euclideanHeuristic(position, problem, info={}):
     xy2 = problem.goal
     return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
 
+def manhattanDistance(position1, position2):
+    "The Manhattan distance heuristic for a PositionSearchProblem"
+    xy1 = position1
+    xy2 = position2
+    return abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1])
+
+
 def euclideanDistance(position1, position2):
     xy1 = position1
     xy2 = position2
@@ -426,6 +433,7 @@ def cornersHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
 
     "*** SOLUTION 1 ***"
+    # Distance to all goals
     # corner_state = state['corner_state']
     # print(corner_state)
 
@@ -438,6 +446,63 @@ def cornersHeuristic(state, problem):
     # return heuristic
 
     "*** SOLUTION 2 ***"
+    # Find closest goal + Distance to other goal
+    corner_state = state['corner_state']
+    close_corner = None
+    goal_corner = []
+    heuristic = 999999
+    for i, corner in enumerate(corner_state):
+        if corner == '0':
+            goal_corner.append(i)
+            dist = manhattanDistance(state['position'], corners[i])
+            if dist < heuristic:
+                heuristic = dist
+                close_corner = i
+    # No corner left
+    if len(goal_corner) == 0:
+        return 0
+
+    from itertools import combinations
+    # goal_edge = sorted([euclideanDistance(corners[a], corners[b]) for a, b in zip(goal_corner, goal_corner[1:])])[:len(goal_corner)-1]
+    goal_edge = sorted([manhattanDistance(corners[a], corners[b]) for a, b in combinations(goal_corner, 2)])
+    # print('---------------------')
+    # print(corner_state)
+    # print(close_corner)
+    # print(goal_corner)
+    # print(goal_edge)
+    # print(corners)
+    # import time
+    # time.sleep(0.1)
+    goal_edge = goal_edge[:len(goal_corner)-1]
+    # print(goal_edge)
+
+    return heuristic + sum(goal_edge)
+
+    "*** SOLUTION 3 ***"
+    # # Find closest goal + Number of Goal left
+    # corner_state = state['corner_state']
+    # close_corner = None
+    # goal_corner = []
+    # heuristic = 999999
+    # for i, corner in enumerate(corner_state):
+    #     if corner == '0':
+    #         goal_corner.append(i)
+    #         dist = manhattanDistance(state['position'], corners[i])
+    #         # print(i, heuristic, dist)
+    #         # print(xy1, xy2)
+    #         if dist < heuristic:
+    #             heuristic = dist
+    #             close_corner = i
+    # # print(close_corner)
+    # if len(goal_corner) == 0:
+    #     return 0
+    # return heuristic + len(goal_corner) - 1
+
+    "*** SOLUTION 4 ***"
+    # Number of goals left
+    # return state['corner_state'].count('0')
+
+    "*** SOLUTION 5 ***"
     # # Find closest goal
     # corner_state = state['corner_state']
     # close_corner = None
@@ -446,41 +511,18 @@ def cornersHeuristic(state, problem):
     # for i, corner in enumerate(corner_state):
     #     if corner == '0':
     #         goal_corner.append(i)
-    #         dist = euclideanDistance(state['position'], corners[i])
+    #         # dist = euclideanDistance(state['position'], corners[i])
+    #         dist = manhattanDistance(state['position'], corners[i])
     #         # print(i, heuristic, dist)
     #         # print(xy1, xy2)
     #         if dist < heuristic:
     #             heuristic = dist
     #             close_corner = i
-    # # print(close_corner)
+    # # 0 Heristic
+    # if len(goal_corner) == 0:
+    #     return 0
     #
-    # goal_edge = sorted([euclideanDistance(corners[a], corners[b]) for a, b in zip(goal_corner, goal_corner[1:])])[:len(goal_corner)-1]
-    # # print(goal_edge)
-    # # import time
-    # # time.sleep(0.01)
-    # return heuristic + sum(goal_edge)
-
-    "*** SOLUTION 3 ***"
-    # Find closest goal
-    # corner_state = state['corner_state']
-    # close_corner = None
-    # goal_corner = []
-    # heuristic = 999999
-    # for i, corner in enumerate(corner_state):
-    #     if corner == '0':
-    #         goal_corner.append(i)
-    #         dist = euclideanDistance(state['position'], corners[i])
-    #         # print(i, heuristic, dist)
-    #         # print(xy1, xy2)
-    #         if dist < heuristic:
-    #             heuristic = dist
-    #             close_corner = i
-    # # print(close_corner)
-    #
-    # return heuristic + len(goal_corner)
-
-    "*** SOLUTION 4 ***"
-    return state['corner_state'].count('0')
+    # return heuristic
 
 
 class AStarCornersAgent(SearchAgent):
