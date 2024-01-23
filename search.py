@@ -22,6 +22,7 @@ import util
 def to_bin(decimal_number, length):
     binary_string = bin(decimal_number)[2:]  # Convert decimal to binary, remove '0b' prefix
     padded_binary_string = binary_string.zfill(length)  # Pad with zeros to reach the specified length
+
     return padded_binary_string
 
 class SearchProblem:
@@ -96,28 +97,20 @@ def depthFirstSearch(problem):
     from util import Stack
 
     start_state = problem.getStartState()
-
     stack = Stack()
     visited = []
     path = None
-
     stack.push((start_state, []))
-
     while not stack.isEmpty():
         current_state = stack.pop()
-
         if problem.isGoalState(current_state[0]):
             path = current_state[1]
             break
-
         if current_state[0] in visited:
             continue
-
         successors = problem.getSuccessors(current_state[0])
-
         for successor in successors:
             stack.push((successor[0], current_state[1] + [successor[1]]))
-
         visited.append(current_state[0])
 
     return path
@@ -131,67 +124,41 @@ def breadthFirstSearch(problem):
     from util import Queue
 
     start_state = problem.getStartState()
-
     queue = Queue()
-    # visited = {to_bin(key, 4): [] for key in range(0,16)}
-    # print(visited.keys())
     path = None
     queue.push((start_state, []))
-
     from searchAgents import CornersProblem
     # Corners Problem
     if isinstance(problem, CornersProblem):
         visited = {to_bin(key, len(problem.corners)): [] for key in range(0, 16)}
         while not queue.isEmpty():
             current_state = queue.pop()
-            # print(current_state)
-            # import time
-            # time.sleep(0.1)
             if problem.isGoalState(current_state[0]):
                 path = current_state[1]
-                # print("here")
-                # print(path)
                 break
-
             corner_state = current_state[0]['corner_state']
             if current_state[0]['position'] in visited[corner_state]:
                 continue
-
-            # print('here1')
             successors = problem.getSuccessors(current_state[0])
-            # print(successors)
             for successor in successors:
                 queue.push((successor[0], current_state[1] + [successor[1]]))
-
-
-            # print('here3')
             visited[corner_state].append(current_state[0]['position'])
-            # problem.visited.append(current_state[0])
-            # print(queue.list)
 
     # Position Problem
     else:
         visited = []
         while not queue.isEmpty():
             current_state = queue.pop()
-            # print(current_state)
-            # import time
-            # time.sleep(1)
             if problem.isGoalState(current_state[0]):
                 path = current_state[1]
                 break
-
             if current_state[0] in visited:
                 continue
-
             successors = problem.getSuccessors(current_state[0])
-
             for successor in successors:
                 queue.push((successor[0], current_state[1] + [successor[1]]))
-
             visited.append(current_state[0])
 
-    # print(path)
     return path
 
     # util.raiseNotDefined()
@@ -202,37 +169,23 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
 
     from util import PriorityQueue
-
     start_state = problem.getStartState()
-
     priority_queue = PriorityQueue()
     visited = []
     path = None
-
     priority_queue.push((start_state, [], 0), 0)
-
     while not priority_queue.isEmpty():
         current_state = priority_queue.pop()
-        # print(current_state)
-        # import time
-        # time.sleep(1)
-
         if problem.isGoalState(current_state[0]):
             path = current_state[1]
             break
-
         if current_state[0] in visited:
             continue
-
         successors = problem.getSuccessors(current_state[0])
-
         for successor in successors:
-            # print(successor)
-
             new_path = current_state[1] + [successor[1]]
             new_cost = current_state[2] + successor[2]
             priority_queue.push((successor[0], new_path, new_cost), new_cost)
-
         visited.append(current_state[0])
 
     return path
@@ -266,84 +219,50 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     if isinstance(problem, CornersProblem):
         visited = {to_bin(key, len(problem.corners)): [] for key in range(0, 16)}
         while not priority_queue.isEmpty():
-            # priority_queue.print()
             current_state = priority_queue.pop()
-            # print(current_state)
-            # import time
-            # time.sleep(1)
-
             if problem.isGoalState(current_state[0]):
                 path = current_state[1]
                 break
-
+            # Estimate f value
             h_value = heuristic(current_state[0], problem)
             g_value = current_state[2]
             f_value = h_value + g_value
 
-
-            # print(current_state[0], f_value)
-            # import time
-            # time.sleep(1)
-
             corner_state = current_state[0]['corner_state']
             flag = False
-            # Check each space?
+            # Check each space
             for visited_node in visited[corner_state]:
-                # Compare visited node in same space?
+                # Compare visited node in same space
                 if current_state[0]['position'] == visited_node[0]['position']:
                     if f_value < visited_node[1]:
                         visited[corner_state].remove(visited_node)
                     else:
                         flag = True
-
                     break
 
             if flag:
                 continue
-
             visited[corner_state].append((current_state[0], f_value))
-
             successors = problem.getSuccessors(current_state[0])
-
             for successor in successors:
-                # print(successor)
-                # import time
-                # time.sleep(1)
                 h_value = heuristic(successor[0], problem)
                 g_value = current_state[2] + successor[2]
                 f_value = h_value + g_value
-                # print(h_value)
-                # if h_value == 0:
-                #     print("hereeeeeeeeeeeeeeeeeeeeee")
-
                 new_path = current_state[1] + [successor[1]]
-
                 priority_queue.push((successor[0], new_path, g_value), f_value)
-
-            # print(corner_state)
 
     # Position Problem
     else:
         visited = []
         while not priority_queue.isEmpty():
-            # priority_queue.print()
             current_state = priority_queue.pop()
-            # print(current_state)
-            # import time
-            # time.sleep(1)
-
             if problem.isGoalState(current_state[0]):
                 path = current_state[1]
                 break
-
+            # Estimate f value
             h_value = heuristic(current_state[0], problem)
             g_value = current_state[2]
             f_value = h_value + g_value
-
-            # print(current_state[0], f_value)
-            # import time
-            # time.sleep(1)
-
             flag = False
             for visited_node in visited:
                 if current_state[0] == visited_node[0]:
@@ -351,28 +270,20 @@ def aStarSearch(problem, heuristic=nullHeuristic):
                         visited.remove(visited_node)
                     else:
                         flag = True
-
                     break
 
             if flag:
                 continue
 
             visited.append((current_state[0], f_value))
-
             successors = problem.getSuccessors(current_state[0])
-
             for successor in successors:
-                # print(successor)
-                # import time
-                # time.sleep(1)
                 h_value = heuristic(successor[0], problem)
                 g_value = current_state[2] + successor[2]
                 f_value = h_value + g_value
-
                 new_path = current_state[1] + [successor[1]]
-
                 priority_queue.push((successor[0], new_path, g_value), f_value)
-    # print(f_value)
+
     return path
 
     # util.raiseNotDefined()
