@@ -1,4 +1,4 @@
-# This is a respository for project of State Space Search of the course Introduction to Atificial Inteligence at Ho Chi Minh Universiy of Technology (Bach Khoa HCM University).
+# This is a respository for the project of State Space Search of the course Introduction to Atificial Inteligence at Ho Chi Minh Universiy of Technology (Bach Khoa HCM University).
 
 This is a project to reproduce Pacmann Game which already had built-in API for graphic and game. My contributions is to build optimal search algorithms to help Pacmann complete his game (search.py, searchAgent.py). <br>
 Some of the algorithms used to optimize search are *Depth First Search, Breadth First Search, Uniform-cost Search, A-star Search.*
