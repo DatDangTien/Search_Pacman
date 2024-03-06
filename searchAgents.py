@@ -299,7 +299,6 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        # self.left_corners = list(self.corners)
 
     def getStartState(self):
         """
@@ -308,7 +307,7 @@ class CornersProblem(search.SearchProblem):
         """
         "*** YOUR CODE HERE ***"
 
-        return {'position': self.startingPosition, 'corner_state': '0000'}
+        return {'pos': self.startingPosition, 'corner': '0000'}
         # util.raiseNotDefined()
 
     def isGoalState(self, state):
@@ -316,13 +315,8 @@ class CornersProblem(search.SearchProblem):
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        # if state in self.left_corners:
-        #     self.left_corners.remove(state)
-        #     self.visited = [self.visited[-1]]
-        #     print("here")
-        # return len(self.left_corners) == 0
 
-        return state['corner_state'] == '1111'
+        return state['corner'] == '1111'
 
 
         # util.raiseNotDefined()
@@ -343,30 +337,31 @@ class CornersProblem(search.SearchProblem):
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
             # print(action)
-            x, y = state['position']
-            corner_state = state['corner_state']
+            x, y = state['pos']
+            corner_label = state['corner']
             "*** YOUR CODE HERE ***"
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
 
             if not self.walls[nextx][nexty]:
-                nextState_position = (nextx, nexty)
+                new_pos = (nextx, nexty)
                 cost = 1
                 try:
-                    i = self.corners.index(nextState_position)
+                    # Check if new_pos is Corner
+                    i = self.corners.index(new_pos)
                 except:
                     pass
                 else:
-                    if corner_state[i] == '1':
+                    if corner_label[i] == '1':
                         continue
 
-                    corner_state = corner_state[0:i] + '1' + corner_state[i+1:]
+                    # Modify String label
+                    corner_label = corner_label[0:i] + '1' + corner_label[i+1:]
 
-                nextState = {'position': nextState_position, 'corner_state': corner_state}
-                successors.append((nextState, action, cost))
+                new_state = {'pos': new_pos, 'corner': corner_label}
+                successors.append((new_state, action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
-
         return successors
 
     def getCostOfActions(self, actions):
@@ -397,103 +392,20 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
-    corners = problem.corners  # These are the corner coordinates
+    corners_pos = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
 
     from util import manhattanDistance
-    "*** SOLUTION 1 ***"
-    # Distance to all goals
-    # corner_state = state['corner_state']
-
-    # '0000'
-    # for i, corner in enumerate(corner_state):
-    #     if corner == '0':
-    #         xy2 = corners[i]
-    #         heuristic += (abs(xy1[0] - xy2[0]) + abs(xy1[1] - xy2[1]))
-
-    # return heuristic
-
-    "*** SOLUTION 2 ***"
-    # Heuristic is Manhattan distance to the closest corner and minimum Manhattan distance among unvisited corners
-    # corner_state = state['corner_state']
-    # close_corner = None
-    # goal_corner = []
-    # heuristic = 999999
-    # for i, corner in enumerate(corner_state):
-    #     # With unvisited corners:
-    #     if corner == '0':
-    #         goal_corner.append(i)
-    #         dist = manhattanDistance(state['position'], corners[i])
-    #         if dist < heuristic:
-    #             heuristic = dist
-    #             close_corner = i
-    # # No corner left
-    # if len(goal_corner) == 0:
-    #     return 0
-    #
-    # from itertools import combinations
-    # goal_edge = sorted([manhattanDistance(corners[a], corners[b]) for a, b in combinations(goal_corner, 2)])
-    # # goal_edge = sorted([manhattanDistance(corners[a], corners[b]) for a, b in [(goal_corner[x-1], goal_corner[x]) for x in range(len(goal_corner))]])
-    # goal_edge = goal_edge[:len(goal_corner)-1]
-
-    # return heuristic + sum(goal_edge)
-
-    "*** SOLUTION 3 ***"
-    # # Find closest goal + Number of Goal left
-    # corner_state = state['corner_state']
-    # close_corner = None
-    # goal_corner = []
-    # heuristic = 999999
-    # for i, corner in enumerate(corner_state):
-    #     if corner == '0':
-    #         goal_corner.append(i)
-    #         dist = manhattanDistance(state['position'], corners[i])
-    #         if dist < heuristic:
-    #             heuristic = dist
-    #             close_corner = i
-    # if len(goal_corner) == 0:
-    #     return 0
-
-    # return heuristic + len(goal_corner) - 1
-
-    "*** SOLUTION 4 ***"
-    # Number of goals left
-    # return state['corner_state'].count('0')
-
-    "*** SOLUTION 5 ***"
-    # # Find closest goal
-    # corner_state = state['corner_state']
-    # close_corner = None
-    # goal_corner = []
-    # heuristic = 999999
-    # for i, corner in enumerate(corner_state):
-    #     if corner == '0':
-    #         goal_corner.append(i)
-    #         # dist = euclideanDistance(state['position'], corners[i])
-    #         dist = manhattanDistance(state['position'], corners[i])
-    #         if dist < heuristic:
-    #             heuristic = dist
-    #             close_corner = i
-    # # 0 Heristic
-    # if len(goal_corner) == 0:
-    #     return 0
-    #
-    # return heuristic
-
-    "*** SOLUTION 6 ***"
     # Maximum distance to all unvisited corners
-    corner_state = state['corner_state']
-    heuristic = [0]
-    for i, corner in enumerate(corner_state):
+    corner_label = state['corner']
+    distances = [0]
+    for i, corner_code in enumerate(corner_label):
         # With unvisited corners:
-        from util import manhattanDistance
-        if corner == '0':
-            distance = manhattanDistance(state['position'], corners[i])
-            heuristic.append(distance)
-
-    return max(heuristic)
+        if corner_code == '0':
+            distances.append(manhattanDistance(state['pos'], corners_pos[i]))
+    return max(distances)
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -595,19 +507,8 @@ def foodHeuristic(state, problem):
     "*** YOUR CODE HERE ***"
     foods = foodGrid.asList()
 
-    "*** SOLUTION 1***"
-    # # Manhattan distance to the farthest food
-    # foodDistance = [0]
-    # from util import manhattanDistance
-    # for food in foods:
-    #     foodDistance.append(manhattanDistance(position, food))
-
-    # return max(foodDistance)
-
-    "*** SOLUTION 2***"
     # Maze distance to the farthest food
     foodDistance = [0]
-    from util import manhattanDistance
     for food in foods:
         foodDistance.append(mazeDistance(position, food, problem.startingGameState))
 
@@ -648,7 +549,6 @@ class ClosestDotSearchAgent(SearchAgent):
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
         from search import breadthFirstSearch
-
         return breadthFirstSearch(problem)
 
 
@@ -687,10 +587,9 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         isGoal = False
         "*** YOUR CODE HERE ***"
         # util.raiseNotDefined()
-        for food_x, food_y in self.food.asList():
-            if (food_x == x) and (food_y == y):
+        for x_food, y_food in self.food.asList():
+            if (x_food == x) and (y_food == y):
                 isGoal = True
-
         return isGoal
 
 def mazeDistance(point1, point2, gameState):
