@@ -1,6 +1,6 @@
 # This is a repository for the project of State Space Search of the course Introduction to Atificial Inteligence at Ho Chi Minh Universiy of Technology (Bach Khoa HCM University).
 
-This is a project to reproduce Pacman Game which already had built-in API for graphic and game. My contribution is to build optimal search algorithms to help Pacmann complete his game (search.py, searchAgent.py). <br>
+This is a project to reproduce Pacman Game which already had built-in API for graphic and game. My contribution is to implement optimal search algorithms to help Pacmann complete his game (search.py, searchAgent.py). <br>
 Some of the algorithms used to optimize search are *Depth First Search, Breadth First Search, Uniform-cost Search, A-star Search.*<br>
 
 Typing at the command line to execute the program with provided testcase: 
